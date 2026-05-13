@@ -51,18 +51,39 @@
     </main>
 
     <!-- AUTHENTIFICATION -->
+  <!-- AUTHENTIFICATION -->
     <section id="view-auth" class="view flex items-center justify-center p-4">
         <div class="glass p-10 rounded-[3rem] w-full max-w-md neon-border">
-            <h2 class="cyber-font text-2xl font-bold text-center mb-8 text-cyan-400">VÉRIFICATION ID</h2>
+            
+            <!-- Onglets de basculement -->
+            <div class="flex gap-2 mb-8 bg-white/5 p-1 rounded-2xl border border-white/10">
+                <button id="tab-login" onclick="window.authManager.switchTab('login')" class="flex-1 py-3 rounded-xl font-bold text-xs bg-cyan-500 text-black transition-all">SE CONNECTER</button>
+                <button id="tab-signup" onclick="window.authManager.switchTab('signup')" class="flex-1 py-3 rounded-xl font-bold text-xs text-gray-400 hover:text-white transition-all">S'INSCRIRE</button>
+            </div>
+
+            <h2 id="auth-title" class="cyber-font text-xl font-bold text-center mb-6 text-cyan-400">CONNEXION AU COMPTE</h2>
+            
             <div class="space-y-4">
-                <input type="text" id="auth-pseudo" placeholder="Pseudo Agent" class="w-full p-4 rounded-2xl outline-none">
-                <input type="password" id="auth-pass" placeholder="Code Secret" class="w-full p-4 rounded-2xl outline-none">
-                <div class="flex gap-3 pt-4">
-                    <button onclick="authManager.handle('login')" class="flex-1 bg-white text-black font-black py-4 rounded-2xl hover:bg-cyan-400">ENTRER</button>
-                    <button onclick="authManager.handle('signup')" class="flex-1 glass font-black py-4 rounded-2xl border-white/20">REJOINDRE</button>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 block mb-1">Pseudo Citoyen</label>
+                    <input type="text" id="auth-pseudo" placeholder="Ex: Agent007" class="w-full p-4 rounded-2xl outline-none focus:border-cyan-400 transition">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 block mb-1">Code Secret (6 caractères min.)</label>
+                    <input type="password" id="auth-pass" placeholder="••••••••" class="w-full p-4 rounded-2xl outline-none focus:border-cyan-400 transition">
+                </div>
+                
+                <!-- Boutons d'action dynamiques -->
+                <div id="action-login" class="pt-4">
+                    <button onclick="window.authManager.handle('login')" class="w-full bg-cyan-500 text-black font-black py-4 rounded-2xl hover:bg-white transition shadow-lg shadow-cyan-500/20">SE CONNECTER</button>
+                </div>
+                <div id="action-signup" class="pt-4 hidden">
+                    <button onclick="window.authManager.handle('signup')" class="w-full glass font-black py-4 rounded-2xl border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition shadow-lg">VALIDER L'INSCRIPTION</button>
                 </div>
             </div>
-            <p id="auth-error" class="text-red-500 text-[10px] text-center mt-6 font-bold uppercase"></p>
+            
+            <!-- Zone d'affichage des messages d'erreur -->
+            <p id="auth-error" class="text-red-500 text-[11px] text-center mt-6 font-bold uppercase tracking-wide"></p>
         </div>
     </section>
 
