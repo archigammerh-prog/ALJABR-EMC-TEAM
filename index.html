@@ -158,51 +158,54 @@
             }
         };
 
-        // 4. GESTIONNAIRE D'AUTHENTIFICATION AMÉLIORÉ
-        window.authManager = {
-            currentUser: null,
-            currentMode: 'login',
+       // --- GESTIONNAIRE D'AUTHENTIFICATION ---
+window.authManager = {
+    currentUser: null,
+    // Fonction de CONNEXION
+    login: async () => {
+        const p = document.getElementById('auth-pseudo').value;
+        const c = document.getElementById('auth-pass').value;
+        if(!p || !c) return alert("Remplis les champs");
+        try {
+            await signInWithEmailAndPassword(fbAuth, `${p.replace(/\s+/g, '')}@republica.io`, c);
+        } catch (e) { 
+            document.getElementById('auth-error').innerText = "IDENTIFIANTS INCORRECTS"; 
+        }
+    },
+    // Fonction d'INSCRIPTION
+    signup: async () => {
+        const p = document.getElementById('auth-pseudo').value;
+        const c = document.getElementById('auth-pass').value;
+        if(p.length < 3) return alert("Pseudo trop court");
+        try {
+            const res = await createUserWithEmailAndPassword(fbAuth, `${p.replace(/\s+/g, '')}@republica.io`, c);
+            await setDoc(doc(db, "users", res.user.uid), { pseudo: p, score: 0 });
+        } catch (e) { 
+            document.getElementById('auth-error').innerText = "ERREUR : COMPTE DÉJÀ EXISTANT"; 
+        }
+    },
+    logout: () => signOut(fbAuth).then(() => window.location.hash = "#auth")
+};
 
-            // Bascule visuelle entre Connexion et Inscription
-            switchTab: (mode) => {
-                window.authManager.currentMode = mode;
-                const tabLogin = document.getElementById('tab-login');
-                const tabSignup = document.getElementById('tab-signup');
-                const actionLogin = document.getElementById('action-login');
-                const actionSignup = document.getElementById('action-signup');
-                const authTitle = document.getElementById('auth-title');
-                const err = document.getElementById('auth-error');
-                
-                if (err) err.innerText = ""; // Réinitialiser le message
-
-                if (mode === 'login') {
-                    tabLogin.className = "flex-1 py-3 rounded-xl font-bold text-xs bg-cyan-500 text-black transition-all";
-                    tabSignup.className = "flex-1 py-3 rounded-xl font-bold text-xs text-gray-400 hover:text-white transition-all";
-                    actionLogin.classList.remove('hidden');
-                    actionSignup.classList.add('hidden');
-                    authTitle.innerText = "CONNEXION AU COMPTE";
-                } else {
-                    tabSignup.className = "flex-1 py-3 rounded-xl font-bold text-xs bg-cyan-500 text-black transition-all";
-                    tabLogin.className = "flex-1 py-3 rounded-xl font-bold text-xs text-gray-400 hover:text-white transition-all";
-                    actionSignup.classList.remove('hidden');
-                    actionLogin.classList.add('hidden');
-                    authTitle.innerText = "CRÉATION DE COMPTE";
-                }
-            },
-
-            handle: async (mode) => {
-                const p = document.getElementById('auth-pseudo').value.trim();
-                const c = document.getElementById('auth-pass').value;
-                const err = document.getElementById('auth-error');
-                
-                // Vérifications de base
-                if (p.length < 3) return err.innerText = "⚠️ PSEUDO TROP COURT (MIN. 3)";
-                if (c.length < 6) return err.innerText = "⚠️ CODE SECRET TROP COURT (MIN. 6)";
-
-                // Indication visuelle de chargement
-                err.className = "text-cyan-400 text-[11px] text-center mt-6 font-bold uppercase tracking-wide animate-pulse";
-                err.innerText = "Communication avec le serveur...";
-
+// --- DÉTECTEUR DE CONNEXION (CORRIGÉ) ---
+onAuthStateChanged(fbAuth, async (user) => {
+    if (user) {
+        const d = await getDoc(doc(db, "users", user.uid));
+        window.authManager.currentUser = { uid: user.uid, ...d.data() };
+        
+        // Mise à jour de l'interface
+        document.getElementById('nav-pseudo').innerText = d.data().pseudo;
+        document.getElementById('nav-score').innerText = `XP: ${d.data().score}`;
+        
+        // FORCE LA REDIRECTION VERS LE HUB
+        window.location.hash = "#hub";
+        router.render();
+    } else {
+        window.authManager.currentUser = null;
+        window.location.hash = "#auth";
+        router.render();
+    }
+});
                 // Création d'un email virtuel pour Firebase Auth
                 const email = `${p.toLowerCase()}@republica.io`;
                 
