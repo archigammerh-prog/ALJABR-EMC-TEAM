@@ -3,337 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REPUBLICA | Intelligence Integrity Lab</title>
+    <title>REPUBLICA | Intelligence Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --republic-blue: #0531ad; --republic-red: #ff2e4d; --neon: #00f2ff; }
-        body { background: #020617; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        :root { --neon: #00f2ff; --purple: #bc13fe; --bg: #030712; }
+        body { background: var(--bg); color: #f8fafc; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .cyber-font { font-family: 'Orbitron', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .neon-text { color: var(--neon); text-shadow: 0 0 15px rgba(0, 242, 255, 0.5); }
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .neon-text { color: var(--neon); text-shadow: 0 0 15px rgba(0, 242, 255, 0.6); }
         .neon-border { border: 1px solid var(--neon); box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
-        .view { display: none; min-height: 100vh; }
-        .view.active { display: block; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .btn-grad { background: linear-gradient(90deg, var(--republic-blue), var(--republic-red)); transition: 0.3s; cursor: pointer; }
-        .btn-grad:hover { filter: brightness(1.2); transform: scale(1.05); }
+        .view { display: none; min-height: 100vh; padding-top: 100px; }
+        .view.active { display: block; animation: fadeIn 0.5s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .btn-cyber { background: linear-gradient(90deg, #0ea5e9, #8b5cf6); transition: 0.3s; cursor: pointer; }
+        .btn-cyber:hover { filter: brightness(1.2); transform: translateY(-2px); box-shadow: 0 0 30px rgba(139, 92, 246, 0.4); }
         .correct { background: #10b981 !important; border-color: #059669 !important; }
-        .wrong { background: #ff2e4d !important; border-color: #be123c !important; }
-        input { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; }
-        .admin-btn { background: #facc15; color: black; font-weight: 800; font-size: 10px; padding: 4px 8px; border-radius: 4px; margin-top: 8px; }
+        .wrong { background: #ef4444 !important; border-color: #b91c1c !important; animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        input { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; text-align: center; }
+        .gold-glow { text-shadow: 0 0 10px #facc15; color: #facc15; }
     </style>
 </head>
 <body>
 
-    <!-- NAVIGATION HEADER -->
-    <nav id="main-nav" class="fixed top-0 w-full z-50 glass border-b border-white/10 px-6 py-4 flex justify-between items-center hidden">
-        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.hash='#home'">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-700 via-white to-red-600"></div>
-            <span class="cyber-font text-xl font-bold tracking-tighter neon-text uppercase">Republica</span>
+    <!-- NAV BAR -->
+    <nav id="main-nav" class="fixed top-0 w-full z-50 glass border-b border-white/5 px-8 py-5 flex justify-between items-center hidden">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="APP.router.go('hub')">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center rotate-45">
+                <span class="rotate-[-45deg] cyber-font font-black">R</span>
+            </div>
+            <span class="cyber-font text-xl font-black neon-text italic">REPUBLICA</span>
         </div>
-        <div class="hidden md:flex gap-8 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            <button onclick="window.location.hash='#home'" class="hover:text-cyan-400 transition">Accueil</button>
-            <button onclick="window.location.hash='#games'" class="hover:text-cyan-400 transition">Missions</button>
-            <button onclick="window.location.hash='#wiki'" class="hover:text-cyan-400 transition">Dictionnaire</button>
-            <button onclick="window.location.hash='#leaderboard'" class="hover:text-cyan-400 transition">Classement</button>
+        <div class="hidden lg:flex gap-10 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            <button onclick="APP.router.go('hub')" class="hover:text-cyan-400 transition">Missions</button>
+            <button onclick="APP.router.go('wiki')" class="hover:text-cyan-400 transition">Dictionnaire</button>
+            <button onclick="APP.router.go('leaderboard')" class="hover:text-cyan-400 transition text-yellow-400">Classement</button>
         </div>
-        <div class="text-right">
-            <p id="nav-pseudo" class="text-xs font-bold text-cyan-400">Agent</p>
-            <p id="nav-score" class="text-[10px] text-slate-500">XP: 0000</p>
+        <div class="flex items-center gap-6">
+            <div class="text-right leading-none">
+                <p id="nav-pseudo" class="text-xs font-bold text-cyan-400 mb-1 uppercase tracking-tighter">Agent</p>
+                <p id="nav-score" class="text-sm font-black cyber-font">0000 XP</p>
+            </div>
+            <button onclick="APP.auth.logout()" class="p-2 glass rounded-lg border-red-500/30 hover:bg-red-500/20"><img src="https://cdn-icons-png.flaticon.com/512/1828/1828445.png" class="w-4 invert opacity-50"></button>
         </div>
     </nav>
 
-    <!-- VUES -->
-    <main id="app-container">
-        <!-- Rendu par le router -->
+    <!-- VIEWS -->
+    <main>
+        <!-- 1. LANDING -->
+        <section id="view-landing" class="view active flex flex-col items-center justify-center text-center p-6">
+            <h1 class="cyber-font text-7xl md:text-9xl font-black italic mb-4 neon-text tracking-tighter">REPUBLICA</h1>
+            <p class="text-xl text-slate-400 mb-12 tracking-[0.5em] uppercase font-light">Information Integrity Lab</p>
+            <button onclick="APP.router.go('auth')" class="px-12 py-5 btn-cyber rounded-xl font-black cyber-font tracking-widest shadow-2xl">ACCÉDER AU TERMINAL</button>
+        </section>
+
+        <!-- 2. LOGIN -->
+        <section id="view-auth" class="view flex items-center justify-center p-4">
+            <div class="glass p-12 rounded-[3rem] w-full max-w-md neon-border text-center">
+                <h2 class="cyber-font text-3xl font-black mb-10 neon-text">IDENTIFICATION</h2>
+                <input type="text" id="auth-pseudo" placeholder="NOM D'AGENT" class="w-full p-5 rounded-2xl outline-none mb-6 cyber-font text-lg border-white/10">
+                <button onclick="APP.auth.login()" class="w-full bg-white text-black font-black py-5 rounded-2xl cyber-font hover:bg-cyan-400 transition-all">LANCER LA SESSION</button>
+            </div>
+        </section>
+
+        <!-- 3. HUB -->
+        <section id="view-hub" class="view p-6 md:p-12">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="cyber-font text-4xl mb-12 italic border-l-8 border-cyan-400 pl-6 uppercase font-black">Unités d'Intervention</h2>
+                <div id="game-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            </div>
+        </section>
+
+        <!-- 4. WIKI -->
+        <section id="view-wiki" class="view p-6 md:p-12">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="cyber-font text-5xl mb-12 italic text-center neon-text uppercase font-black">Base de Données EMI</h2>
+                <div id="wiki-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+        </section>
+
+        <!-- 5. LEADERBOARD -->
+        <section id="view-leaderboard" class="view p-6 md:p-12">
+            <div class="max-w-2xl mx-auto">
+                <h2 class="cyber-font text-4xl text-center mb-12 gold-glow uppercase font-black tracking-tighter">Hall of Fame</h2>
+                <div id="leaderboard-list" class="space-y-4"></div>
+            </div>
+        </section>
     </main>
 
-    <!-- AUTHENTIFICATION -->
-  <!-- AUTHENTIFICATION -->
-    <section id="view-auth" class="view flex items-center justify-center p-4">
-        <div class="glass p-10 rounded-[3rem] w-full max-w-md neon-border">
-            
-            <!-- Onglets de basculement -->
-            <div class="flex gap-2 mb-8 bg-white/5 p-1 rounded-2xl border border-white/10">
-                <button id="tab-login" onclick="window.authManager.switchTab('login')" class="flex-1 py-3 rounded-xl font-bold text-xs bg-cyan-500 text-black transition-all">SE CONNECTER</button>
-                <button id="tab-signup" onclick="window.authManager.switchTab('signup')" class="flex-1 py-3 rounded-xl font-bold text-xs text-gray-400 hover:text-white transition-all">S'INSCRIRE</button>
-            </div>
-
-            <h2 id="auth-title" class="cyber-font text-xl font-bold text-center mb-6 text-cyan-400">CONNEXION AU COMPTE</h2>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 block mb-1">Pseudo Citoyen</label>
-                    <input type="text" id="auth-pseudo" placeholder="Ex: Agent007" class="w-full p-4 rounded-2xl outline-none focus:border-cyan-400 transition">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 block mb-1">Code Secret (6 caractères min.)</label>
-                    <input type="password" id="auth-pass" placeholder="••••••••" class="w-full p-4 rounded-2xl outline-none focus:border-cyan-400 transition">
-                </div>
-                
-                <!-- Boutons d'action dynamiques -->
-                <div id="action-login" class="pt-4">
-                    <button onclick="window.authManager.handle('login')" class="w-full bg-cyan-500 text-black font-black py-4 rounded-2xl hover:bg-white transition shadow-lg shadow-cyan-500/20">SE CONNECTER</button>
-                </div>
-                <div id="action-signup" class="pt-4 hidden">
-                    <button onclick="window.authManager.handle('signup')" class="w-full glass font-black py-4 rounded-2xl border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition shadow-lg">VALIDER L'INSCRIPTION</button>
-                </div>
-            </div>
-            
-            <!-- Zone d'affichage des messages d'erreur -->
-            <p id="auth-error" class="text-red-500 text-[11px] text-center mt-6 font-bold uppercase tracking-wide"></p>
-        </div>
-    </section>
-
-    <!-- GAME MODAL -->
+    <!-- MODAL DE JEU -->
     <div id="game-modal" class="fixed inset-0 z-[100] hidden bg-slate-950/98 flex items-center justify-center p-4">
         <div class="glass w-full max-w-4xl rounded-[4rem] p-12 relative neon-border">
-            <button onclick="gameEngine.quit()" class="absolute top-8 right-8 text-white/30 hover:text-white text-4xl">&times;</button>
-            <div id="game-header" class="flex justify-between items-center mb-12 cyber-font text-[10px] text-slate-500 uppercase tracking-widest">
-                <span id="game-title-disp">MISSION</span>
-                <span id="game-progress">0 / 0</span>
+            <button onclick="APP.game.quit()" class="absolute top-8 right-10 text-white/30 hover:text-white text-5xl">&times;</button>
+            <div class="flex justify-between items-center mb-12 cyber-font text-[10px] text-slate-500 tracking-widest uppercase font-bold border-b border-white/5 pb-6">
+                <span id="game-title-disp">CASE_FILE</span>
+                <span id="game-progress" class="text-white">CHUNK: 0/0</span>
             </div>
             <div id="game-content" class="text-center min-h-[400px] flex flex-col justify-center items-center"></div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, query, orderBy, limit, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // 1. CONFIGURATION (Garde tes clés ici)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBaIxbNnBHSL_UpB5LadZUsPifxriu4EkE",
-            authDomain: "last-hope-60652.firebaseapp.com",
-            projectId: "last-hope-60652",
-            storageBucket: "last-hope-60652.firebasestorage.app",
-            messagingSenderId: "503456003811",
-            appId: "1:503456003811:web:9de6846020c6645ecf77d6",
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const fbAuth = getAuth(app);
-        const db = getFirestore(app);
-
-        // 2. DATA
+    <script>
+        // ==========================================
+        // DATA - 30 DEFINITIONS
+        // ==========================================
         const wikiData = [
-            { id: 0, term: "Désinformation", source: "UNESCO", definition: "Intention délibérée de tromper et nuire.", img: "https://image.pollinations.ai/prompt/hacker-glitch-cyan?nologo=true" },
-            { id: 1, term: "Mésinformation", source: "ONU", definition: "Partage d'erreur par ignorance, sans mauvaise foi.", img: "https://image.pollinations.ai/prompt/error-screen-yellow?nologo=true" },
-            { id: 2, term: "Discours de haine", source: "ONU", definition: "Attaque sur l'identité d'un groupe ou individu.", img: "https://image.pollinations.ai/prompt/broken-megaphone-red?nologo=true" },
-            { id: 3, term: "Deepfake", source: "IA Lab", definition: "Manipulation vidéo/audio par intelligence artificielle.", img: "https://image.pollinations.ai/prompt/robot-face-digital?nologo=true" }
+            { term: "Désinformation", source: "UNESCO 222 EX/16", definition: "Information inexacte destinée à tromper et nuire. Des mensonges transformés en armes." },
+            { term: "Mésinformation", source: "ONU #NonÀLaHaine", definition: "Diffusion involontaire d'informations inexactes partagées de bonne foi. Pollution involontaire." },
+            { term: "Discours de Haine", source: "ONU", definition: "Communication attaquant l'identité d'un groupe (religion, ethnie, genre)." },
+            { term: "MIL (EMI)", source: "UNESCO", definition: "Éducation aux Médias et à l'Information pour renforcer la résilience critique." },
+            { term: "Deepfake", source: "IA Lab", definition: "Vidéo ou audio généré par IA imitant parfaitement une personne pour manipuler." },
+            { term: "Fact-checking", source: "Journalisme", definition: "Processus rigoureux de vérification des preuves par des experts." },
+            { term: "Bulle de filtre", source: "UNESCO", definition: "Isolement algorithmique enfermant l'utilisateur dans ses propres opinions." },
+            { term: "Algorithme", source: "UNESCO", definition: "Règles informatiques de tri privilégiant souvent l'engagement émotionnel." },
+            { term: "Viralité", source: "Analyse Web", definition: "Propagation ultra-rapide d'un contenu, favorisant souvent l'intox." },
+            { term: "Clickbait", source: "Glossaire", definition: "Pute-à-clic. Titre trompeur conçu pour générer des revenus publicitaires." },
+            { term: "Pluralisme", source: "Constitution", definition: "Existence de courants d'opinion différents garantissant la démocratie." },
+            { term: "Souveraineté", source: "Droit", definition: "Capacité d'un État à réguler son espace et ses données numériques." },
+            { term: "Dignité Humaine", source: "ONU", definition: "Valeur absolue de l'individu que la haine cherche à détruire." },
+            { term: "Neutralité", source: "Droit Web", definition: "Principe garantissant le traitement égal de tous les flux de données." },
+            { term: "RGPD", source: "Europe", definition: "Règlement protégeant les données personnelles et la vie privée." },
+            { term: "Parodie", source: "Droit Presse", definition: "Utilisation de l'humour, légale tant qu'elle ne crée pas de haine." },
+            { term: "Biais Cognitif", source: "Psychologie", definition: "Distorsion du jugement qui nous pousse à croire ce qui nous arrange." },
+            { term: "Lanceur d'alerte", source: "Loi Sapin II", definition: "Personne révélant des faits illégaux pour l'intérêt général." },
+            { term: "Chambre d'écho", source: "UNESCO", definition: "Espace où les opinions sont renforcées par répétition sans contradiction." },
+            { term: "Modération", source: "Plateformes", definition: "Contrôle des contenus pour supprimer les messages illégaux." },
+            { term: "Windhoek+30", source: "UNESCO", definition: "Déclaration traitant l'information comme un bien commun mondial." },
+            { term: "Législation Web", source: "UNESCO", definition: "Adaptation des lois réelles à l'instantanéité des réseaux numériques." },
+            { term: "Intégrité de l'Info", source: "UNESCO", definition: "Maintien de la véracité et de la transparence des données publiques." },
+            { term: "Source Fiable", source: "MIL Toolkit", definition: "Origine transparente, reconnue et qui cite ses propres preuves." },
+            { term: "Mentions Légales", source: "Droit Web", definition: "Informations obligatoires pour identifier le propriétaire d'un site." },
+            { term: "Social Media 4 Peace", source: "UNESCO", definition: "Projet de l'ONU pour renforcer la paix via une meilleure utilisation des réseaux." },
+            { term: "Civisme Numérique", source: "EMC", definition: "Respect des règles et d'autrui dans l'espace virtuel." },
+            { term: "Vérification Inversée", source: "EMI Toolkit", definition: "Technique consistant à chercher l'origine d'une image pour voir si elle est détournée." },
+            { term: "Data-mining", source: "Big Data", definition: "Exploitation massive de données à des fins commerciales ou politiques." },
+            { term: "Infodémie", source: "OMS", definition: "Surabondance d'infos rendant difficile la compréhension d'un sujet." }
         ];
 
         const gamesConfig = [
-            { id: "truth-lab", title: "Labo Vérité", icon: "🔬", type: "qcm", questions: [{ q: "L'intention de nuire définit la désinformation ?", a: ["Vrai", "Faux"], c: 0 }, { q: "Un internaute partage une fake news sans le savoir, c'est ?", a: ["Désinformation", "Mésinformation"], c: 1 }] },
-            { id: "reflex", title: "Flash Réflexe", icon: "⚡", type: "vf", questions: [{ q: "La haine en ligne est punie par la loi.", r: true }, { q: "Un algorithme est toujours neutre.", r: false }] },
-            { id: "ia-detect", title: "Cyber-Enquête", icon: "🕵️", type: "qcm", questions: [{ q: "Une image satellite sans date est une preuve fiable ?", a: ["Oui", "Non"], c: 1 }] },
-            { id: "troll-hunt", title: "Alerte Troll", icon: "👾", type: "vf", questions: [{ q: "Un compte créé hier avec 10 000 tweets est suspect ?", r: true }] }
+            { id: "qcm-lab", title: "Labo Vérité", icon: "🔬", type: "qcm", questions: [
+                { q: "Si l'intention est de nuire, c'est de la...", a: ["Mésinformation", "Désinformation", "Parodie"], c: 1 },
+                { q: "Partager une erreur de bonne foi s'appelle...", a: ["Désinformation", "Mésinformation", "Cyber-crime"], c: 1 },
+                { q: "L'UNESCO considère l'info comme un...", a: ["Produit", "Bien Commun", "Secret"], c: 1 }
+            ]},
+            { id: "vf-reflex", title: "Flash Réflexe", icon: "⚡", type: "vf", questions: [
+                { q: "La haine en ligne est punie par la loi.", r: true },
+                { q: "Un algorithme est toujours neutre.", r: false },
+                { q: "Faire une 'Pause' est le 1er conseil de l'ONU.", r: true }
+            ]},
+            { id: "ia-detective", title: "Cyber-Détective", icon: "🕵️", type: "qcm", questions: [
+                { q: "Une image satellite sans date est-elle une preuve fiable ?", a: ["Oui", "Non"], c: 1 },
+                { q: "Une photo d'un officiel avec 6 doigts est suspecte de...", a: ["Manipulation IA", "Mauvais angle"], c: 0 }
+            ]},
+            { id: "vocab-master", title: "Master Vocab", icon: "✍️", type: "qcm", questions: [
+                { q: "Titre pour générer du clic publicitaire ?", a: ["Pute-à-clic", "Deepfake"], c: 0 },
+                { q: "Enfermement dans ses propres idées ?", a: ["Bulle de filtre", "Cité idéale"], c: 0 }
+            ]}
         ];
 
-        // 3. MOTEUR DE ROUTAGE
-        window.router = {
-            render: () => {
-                const page = window.location.hash || '#home';
-                const container = document.getElementById('app-container');
-                const nav = document.getElementById('main-nav');
-                const authView = document.getElementById('view-auth');
+        // ==========================================
+        // ENGINE
+        // ==========================================
+        window.APP = {
+            userData: { pseudo: "", score: 0 },
 
-                if (!window.authManager.currentUser) {
-                    container.innerHTML = "";
-                    authView.style.display = "flex";
-                    nav.classList.add('hidden');
-                    return;
+            router: {
+                go: (view) => {
+                    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                    document.getElementById('view-' + view).classList.add('active');
+                    const nav = document.getElementById('main-nav');
+                    if (['landing', 'auth'].includes(view)) nav.classList.add('hidden');
+                    else nav.classList.remove('hidden');
+
+                    if (view === 'wiki') APP.ui.renderWiki();
+                    if (view === 'hub') APP.ui.renderHub();
+                    if (view === 'leaderboard') APP.ui.renderLeaderboard();
                 }
-
-                authView.style.display = "none";
-                nav.classList.remove('hidden');
-
-                if (page === '#home') ui.renderHome();
-                if (page === '#wiki') ui.renderWiki();
-                if (page === '#games') ui.renderGames();
-                if (page === '#leaderboard') leaderboard.fetch();
-            }
-        };
-
-   // 3. USER MANAGER (Remplace l'Auth)
-        window.userManager = {
-            currentUser: null,
-            initSession: async () => {
-                const p = document.getElementById('auth-pseudo').value.trim();
-                if(p.length < 3) return alert("Pseudo trop court (min 3)");
-
-                const userRef = doc(db, "users", p);
-                const userDoc = await getDoc(userRef);
-
-                if (userDoc.exists()) {
-                    window.userManager.currentUser = { pseudo: p, ...userDoc.data() };
-                } else {
-                    const newData = { pseudo: p, score: 0 };
-                    await setDoc(userRef, newData);
-                    window.userManager.currentUser = newData;
-                }
-                
-                localStorage.setItem('republica_pseudo', p);
-                document.getElementById('nav-pseudo').innerText = p;
-                document.getElementById('nav-score').innerText = `XP: ${window.userManager.currentUser.score}`;
-                window.location.hash = "#hub";
-                router.render();
             },
-            checkAutoLogin: () => {
-                const saved = localStorage.getItem('republica_pseudo');
-                if (saved) {
-                    document.getElementById('auth-pseudo').value = saved;
-                    userManager.initSession();
-                }
-            }
-        };
 
-        // 4. MOTEUR DE ROUTAGE
-        window.router = {
-            render: () => {
-                const page = window.location.hash || '#landing';
-                const container = document.getElementById('app-container');
-                const nav = document.getElementById('main-nav');
-                const authView = document.getElementById('view-auth');
-
-                if (!window.userManager.currentUser) {
-                    container.innerHTML = "";
-                    authView.style.display = "flex";
-                    nav.classList.add('hidden');
-                    return;
-                }
-
-                authView.style.display = "none";
-                nav.classList.remove('hidden');
-
-                if (page === '#hub' || page === '#landing') ui.renderHub();
-                if (page === '#wiki') ui.renderWiki();
-                if (page === '#leaderboard') leaderboard.fetch();
-            }
-        };
-
-        // 5. INTERFACE UI
-        window.ui = {
-            renderHub: () => {
-                document.getElementById('app-container').innerHTML = `
-                <div class="pt-28 p-8 max-w-7xl mx-auto text-center">
-                    <h1 class="text-5xl cyber-font neon-text mb-12">HUB DE MISSIONS</h1>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                        ${gamesConfig.map((g, i) => `
-                        <div onclick="gameEngine.start(${i})" class="glass p-10 rounded-[3rem] cursor-pointer border border-white/5 hover:neon-border transition-all">
-                            <div class="text-6xl mb-6">${g.icon}</div>
-                            <h3 class="cyber-font text-2xl font-bold mb-2">${g.title}</h3>
-                            <button class="bg-cyan-500/10 text-cyan-400 text-[10px] font-black px-6 py-2 rounded-full uppercase">Lancer</button>
-                        </div>`).join('')}
-                    </div>
-                </div>`;
+            auth: {
+                login: () => {
+                    const p = document.getElementById('auth-pseudo').value.trim().toUpperCase();
+                    if (p.length < 2) return alert("Pseudo trop court !");
+                    APP.userData.pseudo = p;
+                    const savedScore = localStorage.getItem('republica_xp_' + p);
+                    APP.userData.score = savedScore ? parseInt(savedScore) : 0;
+                    document.getElementById('nav-pseudo').innerText = p;
+                    APP.ui.updateScoreDisplay();
+                    APP.router.go('hub');
+                },
+                logout: () => APP.router.go('landing')
             },
-            renderWiki: () => {
-                let html = `<div class="pt-28 p-8 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">`;
-                wikiData.forEach(d => {
-                    html += `
-                        <div class="glass rounded-3xl overflow-hidden border border-white/5 hover:border-cyan-400 transition-all">
-                            <img src="${d.img}" class="w-full h-48 object-cover">
-                            <div class="p-6">
-                                <h3 class="text-2xl font-bold mb-2 cyber-font text-cyan-400 uppercase">${d.term}</h3>
-                                <p class="text-sm text-slate-400 leading-relaxed">${d.definition}</p>
+
+            ui: {
+                updateScoreDisplay: () => {
+                    document.getElementById('nav-score').innerText = APP.userData.score + " XP";
+                },
+                renderWiki: () => {
+                    document.getElementById('wiki-grid').innerHTML = wikiData.map(d => `
+                        <div class="glass p-8 rounded-[2rem] border border-white/5 hover:border-cyan-400 transition-all group">
+                            <h3 class="text-xl font-black neon-text uppercase mb-2 cyber-font">${d.term}</h3>
+                            <p class="text-[9px] text-cyan-500 font-bold uppercase tracking-widest mb-3">${d.source}</p>
+                            <p class="text-xs text-slate-400 leading-relaxed">${d.definition}</p>
+                        </div>`).join('');
+                },
+                renderHub: () => {
+                    document.getElementById('game-grid').innerHTML = gamesConfig.map((g, i) => `
+                        <div onclick="APP.game.start(${i})" class="glass p-10 rounded-[3rem] cursor-pointer border border-white/5 hover:neon-border transition-all text-center group">
+                            <div class="text-6xl mb-6 group-hover:scale-110 transition-transform">${g.icon}</div>
+                            <h3 class="cyber-font text-xl font-bold mb-3">${g.title}</h3>
+                            <span class="text-[9px] font-black bg-white/10 px-4 py-1 rounded-full uppercase">${g.type}</span>
+                        </div>`).join('');
+                },
+                renderLeaderboard: () => {
+                    let allUsers = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        let key = localStorage.key(i);
+                        if (key.startsWith('republica_xp_')) {
+                            allUsers.push({ pseudo: key.replace('republica_xp_', ''), xp: parseInt(localStorage.getItem(key)) });
+                        }
+                    }
+                    allUsers.sort((a, b) => b.xp - a.xp);
+                    document.getElementById('leaderboard-list').innerHTML = allUsers.map((u, i) => `
+                        <div class="glass p-6 rounded-3xl flex justify-between items-center ${i === 0 ? 'border-yellow-500/50' : 'border-white/5'}">
+                            <div class="flex items-center gap-6">
+                                <span class="cyber-font text-2xl ${i === 0 ? 'gold-glow' : 'opacity-20'}">#${i+1}</span>
+                                <span class="font-bold text-xl uppercase">${u.pseudo}</span>
                             </div>
-                        </div>`;
-                });
-                document.getElementById('app-container').innerHTML = html + `</div>`;
-            }
-        };
-
-        // 6. GAME ENGINE
-        window.gameEngine = {
-            currentQ: 0, score: 0, config: null,
-            start: (idx) => {
-                gameEngine.config = gamesConfig[idx];
-                gameEngine.currentQ = 0; gameEngine.score = 0;
-                document.getElementById('game-modal').classList.remove('hidden');
-                gameEngine.renderNext();
-            },
-            renderNext: () => {
-                const cont = document.getElementById('game-content');
-                const cfg = gameEngine.config;
-                if(gameEngine.currentQ >= cfg.questions.length) return gameEngine.end();
-
-                const q = cfg.questions[gameEngine.currentQ];
-                document.getElementById('game-title-disp').innerText = cfg.title.toUpperCase();
-                document.getElementById('game-progress').innerText = `${gameEngine.currentQ + 1} / ${cfg.questions.length}`;
-
-                if(cfg.type === 'qcm') {
-                    cont.innerHTML = `
-                        <h2 class="text-3xl font-bold mb-10 leading-tight">${q.q}</h2>
-                        <div class="grid grid-cols-1 gap-4 w-full">
-                            ${q.a.map((ans, i) => `<button onclick="gameEngine.check(${i})" class="p-5 glass rounded-2xl font-bold hover:bg-white hover:text-black transition">${ans}</button>`).join('')}
-                        </div>`;
-                } else {
-                    cont.innerHTML = `
-                        <h2 class="text-3xl font-bold mb-12">${q.q}</h2>
-                        <div class="flex gap-6 w-full max-w-md">
-                            <button onclick="gameEngine.check(true)" class="flex-1 p-10 bg-green-500/20 border border-green-500 rounded-3xl text-2xl font-black">VRAI</button>
-                            <button onclick="gameEngine.check(false)" class="flex-1 p-10 bg-red-500/20 border border-red-500 rounded-3xl text-2xl font-black">FAUX</button>
-                        </div>`;
+                            <span class="cyber-font neon-text text-xl">${u.xp} XP</span>
+                        </div>`).join('') || '<p class="text-center opacity-30">Aucun agent enregistré dans le Hall of Fame.</p>';
                 }
             },
-            check: (val) => {
-                const q = gameEngine.config.questions[gameEngine.currentQ];
-                const isCorrect = (gameEngine.config.type === 'qcm') ? (val === q.c) : (val === q.r);
-                const modal = document.getElementById('game-modal');
-                
-                if(isCorrect) { gameEngine.score += 100; modal.classList.add('correct'); }
-                else modal.classList.add('wrong');
 
-                setTimeout(() => {
-                    modal.classList.remove('correct', 'wrong');
-                    gameEngine.currentQ++;
-                    gameEngine.renderNext();
-                }, 600);
-            },
-            end: async () => {
-                document.getElementById('game-content').innerHTML = `
-                    <h2 class="cyber-font text-5xl text-cyan-400 mb-6 italic">MISSION RÉUSSIE</h2>
-                    <p class="text-2xl mb-8">+ ${gameEngine.score} XP GAGNÉS</p>
-                    <button onclick="gameEngine.quit()" class="bg-white text-black font-black px-10 py-4 rounded-full font-bold">RETOUR HUB</button>`;
-                
-                if(window.authManager.currentUser) {
-                    await updateDoc(doc(db, "users", window.authManager.currentUser.uid), {
-                        score: increment(gameEngine.score)
-                    });
+            game: {
+                active: null, qIdx: 0, sessionXP: 0,
+                start: (idx) => {
+                    APP.game.active = gamesConfig[idx];
+                    APP.game.qIdx = 0; APP.game.sessionXP = 0;
+                    document.getElementById('game-modal').classList.remove('hidden');
+                    APP.game.render();
+                },
+                render: () => {
+                    const cont = document.getElementById('game-content');
+                    const qData = APP.game.active.questions[APP.game.qIdx];
+                    if (!qData) return APP.game.end();
+
+                    document.getElementById('game-title-disp').innerText = APP.game.active.title.toUpperCase();
+                    document.getElementById('game-progress').innerText = `DATA_CHUNK: ${APP.game.qIdx + 1}/${APP.game.active.questions.length}`;
+
+                    if (APP.game.active.type === 'qcm') {
+                        cont.innerHTML = `<h2 class="text-3xl font-black mb-12 leading-tight">${qData.q}</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+                                ${qData.a.map((ans, i) => `<button onclick="APP.game.check(${i})" class="p-6 glass rounded-2xl font-bold text-sm hover:bg-white hover:text-black transition-all border border-white/5">${ans}</button>`).join('')}
+                            </div>`;
+                    } else {
+                        cont.innerHTML = `<h2 class="text-3xl font-black mb-12 leading-tight">${qData.q}</h2>
+                            <div class="flex gap-8 w-full max-w-md">
+                                <button onclick="APP.game.check(true)" class="flex-1 py-12 glass border-green-500/30 rounded-3xl text-2xl font-black hover:correct transition-all uppercase">Vrai</button>
+                                <button onclick="APP.game.check(false)" class="flex-1 py-12 glass border-red-500/30 rounded-3xl text-2xl font-black hover:wrong transition-all uppercase">Faux</button>
+                            </div>`;
+                    }
+                },
+                check: (val) => {
+                    const qData = APP.game.active.questions[APP.game.qIdx];
+                    const isCorrect = (APP.game.active.type === 'qcm') ? (val === qData.c) : (val === qData.r);
+                    const modal = document.getElementById('game-modal');
+                    if (isCorrect) { APP.game.sessionXP += 100; modal.classList.add('correct'); }
+                    else modal.classList.add('wrong');
+
+                    setTimeout(() => {
+                        modal.classList.remove('correct', 'wrong');
+                        APP.game.qIdx++;
+                        APP.game.render();
+                    }, 600);
+                },
+                end: () => {
+                    document.getElementById('game-content').innerHTML = `
+                        <h2 class="cyber-font text-6xl neon-text mb-6 font-black italic">MISSION_SUCCESS</h2>
+                        <p class="text-2xl mb-12">+ ${APP.game.sessionXP} XP COLLECTÉS SUR LE RÉSEAU</p>
+                        <button onclick="APP.game.quit(true)" class="px-12 py-5 btn-cyber rounded-2xl font-black cyber-font shadow-2xl">VALIDER LES DONNÉES</button>`;
+                },
+                quit: (save) => {
+                    if (save) {
+                        APP.userData.score += APP.game.sessionXP;
+                        localStorage.setItem('republica_xp_' + APP.userData.pseudo, APP.userData.score);
+                        APP.ui.updateScoreDisplay();
+                    }
+                    document.getElementById('game-modal').classList.add('hidden');
                 }
-            },
-            quit: () => {
-                document.getElementById('game-modal').classList.add('hidden');
-                document.getElementById('game-content').innerHTML = "";
             }
         };
 
-        window.leaderboard = {
-            fetch: () => {
-                const q = query(collection(db, "users"), orderBy("score", "desc"), limit(10));
-                onSnapshot(q, (snap) => {
-                    document.getElementById('app-container').innerHTML = `
-                        <div class="pt-28 p-8 max-w-2xl mx-auto">
-                            <h2 class="cyber-font text-4xl text-center mb-12 neon-text">CLASSEMENT MONDIAL</h2>
-                            <div class="space-y-4">
-                                ${snap.docs.map((doc, i) => `
-                                    <div class="glass p-5 rounded-3xl flex justify-between items-center ${i === 0 ? 'border-cyan-400' : 'border-white/5'}">
-                                        <span class="cyber-font text-slate-500 text-xl">#${i+1}</span>
-                                        <span class="font-bold text-lg uppercase">${doc.data().pseudo}</span>
-                                        <span class="cyber-font text-cyan-400">${doc.data().score} XP</span>
-                                    </div>`).join('')}
-                            </div>
-                        </div>`;
-                });
-            }
-        };
-
-        window.addEventListener('hashchange', router.render);
-        router.render();
+        APP.router.go('landing');
     </script>
 </body>
 </html>
