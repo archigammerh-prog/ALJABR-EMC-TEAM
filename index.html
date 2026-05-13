@@ -158,47 +158,81 @@
             }
         };
 
-        // 4. AUTH MANAGER
+        // 4. GESTIONNAIRE D'AUTHENTIFICATION AMÉLIORÉ
         window.authManager = {
             currentUser: null,
-            isAdmin: false,
+            currentMode: 'login',
+
+            // Bascule visuelle entre Connexion et Inscription
+            switchTab: (mode) => {
+                window.authManager.currentMode = mode;
+                const tabLogin = document.getElementById('tab-login');
+                const tabSignup = document.getElementById('tab-signup');
+                const actionLogin = document.getElementById('action-login');
+                const actionSignup = document.getElementById('action-signup');
+                const authTitle = document.getElementById('auth-title');
+                const err = document.getElementById('auth-error');
+                
+                if (err) err.innerText = ""; // Réinitialiser le message
+
+                if (mode === 'login') {
+                    tabLogin.className = "flex-1 py-3 rounded-xl font-bold text-xs bg-cyan-500 text-black transition-all";
+                    tabSignup.className = "flex-1 py-3 rounded-xl font-bold text-xs text-gray-400 hover:text-white transition-all";
+                    actionLogin.classList.remove('hidden');
+                    actionSignup.classList.add('hidden');
+                    authTitle.innerText = "CONNEXION AU COMPTE";
+                } else {
+                    tabSignup.className = "flex-1 py-3 rounded-xl font-bold text-xs bg-cyan-500 text-black transition-all";
+                    tabLogin.className = "flex-1 py-3 rounded-xl font-bold text-xs text-gray-400 hover:text-white transition-all";
+                    actionSignup.classList.remove('hidden');
+                    actionLogin.classList.add('hidden');
+                    authTitle.innerText = "CRÉATION DE COMPTE";
+                }
+            },
+
             handle: async (mode) => {
-                const p = document.getElementById('auth-pseudo').value;
+                const p = document.getElementById('auth-pseudo').value.trim();
                 const c = document.getElementById('auth-pass').value;
                 const err = document.getElementById('auth-error');
                 
-                // Login spécial admin
-                if(p === "admin" && c === "admin") {
-                    window.authManager.isAdmin = true;
-                }
+                // Vérifications de base
+                if (p.length < 3) return err.innerText = "⚠️ PSEUDO TROP COURT (MIN. 3)";
+                if (c.length < 6) return err.innerText = "⚠️ CODE SECRET TROP COURT (MIN. 6)";
 
-                const email = `${p.replace(/\s+/g, '')}@republica.io`;
+                // Indication visuelle de chargement
+                err.className = "text-cyan-400 text-[11px] text-center mt-6 font-bold uppercase tracking-wide animate-pulse";
+                err.innerText = "Communication avec le serveur...";
+
+                // Création d'un email virtuel pour Firebase Auth
+                const email = `${p.toLowerCase()}@republica.io`;
+                
                 try {
-                    if(mode === 'signup') {
+                    if (mode === 'signup') {
                         const res = await createUserWithEmailAndPassword(fbAuth, email, c);
+                        // Initialiser le profil dans Firestore
                         await setDoc(doc(db, "users", res.user.uid), { pseudo: p, score: 0 });
                     } else {
                         await signInWithEmailAndPassword(fbAuth, email, c);
                     }
-                } catch (e) { err.innerText = "ERREUR D'IDENTIFICATION"; }
+                    err.innerText = "";
+                } catch (e) {
+                    err.className = "text-red-500 text-[11px] text-center mt-6 font-bold uppercase tracking-wide";
+                    
+                    // Détection précise des erreurs pour le mode En Ligne
+                    if (e.code === 'auth/email-already-in-use') {
+                        err.innerText = "⚠️ CE PSEUDO EXISTE DÉJÀ. PASSEZ EN MODE CONNEXION.";
+                    } else if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
+                        err.innerText = "⚠️ PSEUDO OU CODE SECRET INCORRECT.";
+                    } else if (e.code === 'auth/network-request-failed') {
+                        err.innerText = "⚠️ ERREUR RÉSEAU : VÉRIFIEZ VOTRE CONNEXION INTERNET.";
+                    } else {
+                        err.innerText = "⚠️ ACCÈS REFUSÉ. VÉRIFIEZ VOS RÈGLES FIREBASE.";
+                        console.error("Firebase Error:", e);
+                    }
+                }
             },
             logout: () => signOut(fbAuth)
         };
-
-        onAuthStateChanged(fbAuth, async (user) => {
-            if (user) {
-                const d = await getDoc(doc(db, "users", user.uid));
-                const data = d.data();
-                window.authManager.currentUser = { uid: user.uid, ...data };
-                window.authManager.isAdmin = (data.pseudo === "admin");
-                document.getElementById('nav-pseudo').innerText = data.pseudo;
-                document.getElementById('nav-score').innerText = `XP: ${data.score}`;
-                router.render();
-            } else {
-                window.authManager.currentUser = null;
-                router.render();
-            }
-        });
 
         // 5. INTERFACE UI
         window.ui = {
